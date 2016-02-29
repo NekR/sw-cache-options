@@ -73,6 +73,34 @@
       '/tests/test_ignoreSearch_keysWithQuery': [
         '/ignoreSearch?3',
       ],
+
+      // delete()
+      '/tests/test_ignoreSearch_deleteIgnoreNoQuery': {
+        deleted: true,
+        keys: ['/__ignoreSearch']
+      },
+      '/tests/test_ignoreSearch_deleteNoQuery': {
+        deleted: true,
+        keys: [
+          '/__ignoreSearch',
+          '/ignoreSearch?1',
+          '/ignoreSearch?2',
+          '/ignoreSearch?3',
+        ]
+      },
+      '/tests/test_ignoreSearch_deleteIgnoreWithQuery': {
+        deleted: true,
+        keys: ['/__ignoreSearch']
+      },
+      '/tests/test_ignoreSearch_deleteWithQuery': {
+        deleted: true,
+        keys: [
+          '/__ignoreSearch',
+          '/ignoreSearch?1',
+          '/ignoreSearch?2',
+          '/ignoreSearch',
+        ]
+      },
     };
 
     /*var requests = {

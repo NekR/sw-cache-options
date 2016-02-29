@@ -7,46 +7,7 @@ importScripts('../lib/index.js');
 
 var tests = {
   ignoreSearch_store: function(e) {
-    return caches.delete('ignoreSearch').then(function() {
-      return Promise.all([
-        caches.open('ignoreSearch'),
-        caches.open('ignoreSearchObstacle')
-      ]);
-    }).then(function(args) {
-      const cache = args[0];
-      const obstacleCache = args[1];
-
-      return Promise.all([
-        putSeries(cache, [
-          ['/__ignoreSearch', createResponse({
-            cached: true,
-            index: -1
-          })],
-          ['/ignoreSearch?1', createResponse({
-            cached: true,
-            index: 1
-          })],
-          ['/ignoreSearch?2', createResponse({
-            cached: true,
-            index: 2
-          })],
-          ['/ignoreSearch?3', createResponse({
-            cached: true,
-            index: 3
-          })],
-          ['/ignoreSearch', createResponse({
-            cached: true,
-            index: 4
-          })],
-        ]),
-
-        obstacleCache.put('/ignoreSearch?10', createResponse({
-          cached: true,
-          index: 10,
-          obstacle: true
-        })),
-      ]);
-    }).then(function() {
+    return ignoreSearchPrepare().then(function() {
       return createResponse({});
     });
   },
@@ -260,7 +221,129 @@ var tests = {
       return createResponse(data);
     });
   },
+
+  // delete()
+  ignoreSearch_deleteIgnoreNoQuery: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return deleteHelper(cache, '/ignoreSearch', {
+        ignoreSearch: true
+      });
+    }).then(function(data) {
+      return ignoreSearchPrepare().then(function() {
+        return data;
+      })
+    }).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_deleteNoQuery: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return deleteHelper(cache, '/ignoreSearch', {
+        ignoreSearch: false
+      });
+    }).then(function(data) {
+      return ignoreSearchPrepare().then(function() {
+        return data;
+      })
+    }).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_deleteIgnoreWithQuery: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return deleteHelper(cache, '/ignoreSearch?3', {
+        ignoreSearch: true
+      });
+    }).then(function(data) {
+      return ignoreSearchPrepare().then(function() {
+        return data;
+      })
+    }).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_deleteWithQuery: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return deleteHelper(cache, '/ignoreSearch?3', {
+        ignoreSearch: false
+      });
+    }).then(function(data) {
+      return ignoreSearchPrepare().then(function() {
+        return data;
+      })
+    }).then(function(data) {
+      return createResponse(data);
+    });
+  },
 };
+
+function ignoreSearchPrepare() {
+  return Promise.all([
+    caches.delete('ignoreSearch'),
+    caches.delete('ignoreSearchObstacle'),
+  ]).then(function() {
+    return Promise.all([
+      caches.open('ignoreSearch'),
+      caches.open('ignoreSearchObstacle')
+    ]);
+  }).then(function(args) {
+    const cache = args[0];
+    const obstacleCache = args[1];
+
+    return Promise.all([
+      putSeries(cache, [
+        ['/__ignoreSearch', createResponse({
+          cached: true,
+          index: -1
+        })],
+        ['/ignoreSearch?1', createResponse({
+          cached: true,
+          index: 1
+        })],
+        ['/ignoreSearch?2', createResponse({
+          cached: true,
+          index: 2
+        })],
+        ['/ignoreSearch?3', createResponse({
+          cached: true,
+          index: 3
+        })],
+        ['/ignoreSearch', createResponse({
+          cached: true,
+          index: 4
+        })],
+      ]),
+
+      obstacleCache.put('/ignoreSearch?10', createResponse({
+        cached: true,
+        index: 10,
+        obstacle: true
+      })),
+    ]);
+  });
+}
+
+function deleteHelper(cache, request, options) {
+  const data = {};
+
+  return cache.delete(request, options)
+  .then(function(deleted) {
+    data.deleted = deleted;
+    return keys_original.call(cache);
+  })
+  .then(mapKeys)
+  .then(function(keys) {
+    data.keys = keys;
+    return data;
+  });
+}
+
+function mapKeys(keys) {
+  return keys.map(function(req) {
+    var url = new URL(req.url);
+    return url.pathname + url.search;
+  });
+}
 
 self.addEventListener('install', function(e) {
   e.waitUntil(Promise.resolve());
