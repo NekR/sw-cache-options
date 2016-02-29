@@ -1,0 +1,110 @@
+<!doctype html>
+
+<script>
+  (function() {
+    navigator.serviceWorker.register('sw.js').then(function() {
+      console.log('Ready');
+    }, function(e) {
+      console.error(e);
+    });
+
+    var requests = {
+      '/tests/test_ignoreSearch_store': {},
+
+      // match()
+      '/tests/test_ignoreSearch_matchIgnoreNoQuery': { cached: true, index: 1 },
+      '/tests/test_ignoreSearch_matchNoQuery': { cached: true, index: 4 },
+      '/tests/test_ignoreSearch_matchIgnoreWithQuery': { cached: true, index: 1 },
+      '/tests/test_ignoreSearch_matchWithQuery': { cached: true, index: 3 },
+
+      // matchAll()
+      '/tests/test_ignoreSearch_matchAllIgnoreNoQuery': [
+        { cached: true, index: 1 },
+        { cached: true, index: 2 },
+        { cached: true, index: 3 },
+        { cached: true, index: 4 },
+      ],
+      '/tests/test_ignoreSearch_matchAllNoQuery': [
+        { cached: true, index: 4 }
+      ],
+      '/tests/test_ignoreSearch_matchAllIgnoreWithQuery': [
+        { cached: true, index: 1 },
+        { cached: true, index: 2 },
+        { cached: true, index: 3 },
+        { cached: true, index: 4 },
+      ],
+      '/tests/test_ignoreSearch_matchAllWithQuery': [
+        { cached: true, index: 3 }
+      ],
+
+      // keys() basics
+      'test_ignoreSearch_keysRequest:no-polyfill': [
+        '/ignoreSearch',
+      ],
+
+      'test_ignoreSearch_keysRequest': [
+        '/ignoreSearch',
+      ],
+
+      '/tests/test_ignoreSearch_keysNoRequest': [
+        '/__ignoreSearch',
+        '/ignoreSearch?1',
+        '/ignoreSearch?2',
+        '/ignoreSearch?3',
+        '/ignoreSearch',
+      ],
+
+      // keys(request)
+      '/tests/test_ignoreSearch_keysIgnoreNoQuery': [
+        '/ignoreSearch?1',
+        '/ignoreSearch?2',
+        '/ignoreSearch?3',
+        '/ignoreSearch',
+      ],
+      '/tests/test_ignoreSearch_keysNoQuery': [
+        '/ignoreSearch',
+      ],
+      '/tests/test_ignoreSearch_keysIgnoreWithQuery': [
+        '/ignoreSearch?1',
+        '/ignoreSearch?2',
+        '/ignoreSearch?3',
+        '/ignoreSearch',
+      ],
+      '/tests/test_ignoreSearch_keysWithQuery': [
+        '/ignoreSearch?3',
+      ],
+    };
+
+    /*var requests = {
+      '/tests/test_ignoreSearch_store': {},
+      '/tests/test_ignoreSearch_keysRequest': [
+        '/ignoreSearch',
+      ],
+      '/tests/test_ignoreSearch_keysRequest:no-polyfill': [
+        '/ignoreSearch',
+      ],
+    };*/
+
+    window.start = function() {
+      Object.keys(requests).reduce(function(prev, req) {
+        return prev.then(function() {
+          return fetch(req);
+        }).then(function(res) {
+          return res.json();
+        }).then(function(actual) {
+          const expected = requests[req];
+
+          if (JSON.stringify(expected) === JSON.stringify(actual)) {
+            console.log(`Request [${ req }] passed`);
+          } else {
+            console.error(`Request [${ req }] not passed`);
+            console.info('Expected:', JSON.stringify(expected, null, '  '));
+            console.info('Actual:', JSON.stringify(actual, null, '  '));
+          }
+        });
+      }, Promise.resolve()).then(function() {
+        console.info('DONE');
+      });
+    };
+  }());
+</script>
