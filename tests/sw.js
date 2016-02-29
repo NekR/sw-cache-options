@@ -17,26 +17,28 @@ var tests = {
       const obstacleCache = args[1];
 
       return Promise.all([
-        cache.put('/__ignoreSearch', createResponse({
-          cached: true,
-          index: -1
-        })),
-        cache.put('/ignoreSearch?1', createResponse({
-          cached: true,
-          index: 1
-        })),
-        cache.put('/ignoreSearch?2', createResponse({
-          cached: true,
-          index: 2
-        })),
-        cache.put('/ignoreSearch?3', createResponse({
-          cached: true,
-          index: 3
-        })),
-        cache.put('/ignoreSearch', createResponse({
-          cached: true,
-          index: 4
-        })),
+        putSeries(cache, [
+          ['/__ignoreSearch', createResponse({
+            cached: true,
+            index: -1
+          })],
+          ['/ignoreSearch?1', createResponse({
+            cached: true,
+            index: 1
+          })],
+          ['/ignoreSearch?2', createResponse({
+            cached: true,
+            index: 2
+          })],
+          ['/ignoreSearch?3', createResponse({
+            cached: true,
+            index: 3
+          })],
+          ['/ignoreSearch', createResponse({
+            cached: true,
+            index: 4
+          })],
+        ]),
 
         obstacleCache.put('/ignoreSearch?10', createResponse({
           cached: true,
@@ -297,4 +299,12 @@ function createResponse(data) {
       'Content-Type': 'application/json',
     }
   });
+}
+
+function putSeries(cache, arr) {
+  return arr.reduce(function(prev, args) {
+    return prev.then(function() {
+      return cache.put.apply(cache, args);
+    });
+  }, Promise.resolve());
 }
