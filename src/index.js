@@ -62,11 +62,7 @@
       );
 
       // Get all requests in Cache, with original keys() method
-      return cacheKeysMethod.call(
-        this,
-        // Chrome doesn't accept params to Cache#keys()
-        request
-      ).then((keys) => {
+      return cacheKeysMethod.call(this).then((keys) => {
         // Filter with specified options
         keys = keys.filter((cached) => {
           return matchUrls(requestURL, cached, options);
