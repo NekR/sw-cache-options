@@ -2,9 +2,11 @@
 
 ## Install
 
-#### Webpack/Browserify/whatever-bundler
+#### Webpack/Browserify/Whatever-bundler
 
-`npm install -i sw-cache-options`
+```
+npm install -i sw-cache-options
+```
 
 #### Browser
 
