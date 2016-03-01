@@ -496,7 +496,7 @@ function mapKeys(keys) {
 }
 
 self.addEventListener('install', function(e) {
-  e.waitUntil(Promise.resolve());
+  e.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', function(e) {

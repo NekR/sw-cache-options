@@ -2,159 +2,179 @@
 
 <script>
   (function() {
+    var tests = {
+      init: {
+        '/tests/test_ignoreSearch_store': {},
+      },
+
+      platform: {
+        // other
+        '/tests/test_ignoreSearch_keysRequest:no-polyfill': [
+          '/ignoreSearch',
+        ],
+      },
+
+      polyfill: {
+        // match()
+        '/tests/test_ignoreSearch_matchIgnoreNoQuery': { cached: true, index: 1 },
+        '/tests/test_ignoreSearch_matchNoQuery': { cached: true, index: 4 },
+        '/tests/test_ignoreSearch_matchIgnoreWithQuery': { cached: true, index: 1 },
+        '/tests/test_ignoreSearch_matchWithQuery': { cached: true, index: 3 },
+        '/tests/test_ignoreSearch_matchIgnoreNoMatch': { cached: false },
+        '/tests/test_ignoreSearch_matchNoMatch': { cached: false },
+
+        // matchAll()
+        '/tests/test_ignoreSearch_matchAllIgnoreNoQuery': [
+          { cached: true, index: 1 },
+          { cached: true, index: 2 },
+          { cached: true, index: 3 },
+          { cached: true, index: 4 },
+        ],
+        '/tests/test_ignoreSearch_matchAllNoQuery': [
+          { cached: true, index: 4 }
+        ],
+        '/tests/test_ignoreSearch_matchAllIgnoreWithQuery': [
+          { cached: true, index: 1 },
+          { cached: true, index: 2 },
+          { cached: true, index: 3 },
+          { cached: true, index: 4 },
+        ],
+        '/tests/test_ignoreSearch_matchAllWithQuery': [
+          { cached: true, index: 3 }
+        ],
+        '/tests/test_ignoreSearch_matchAllIgnoreNoMatch': [],
+        '/tests/test_ignoreSearch_matchAllNoMatch': [],
+
+        // keys() basics
+
+        '/tests/test_ignoreSearch_keysRequest': [
+          '/ignoreSearch',
+        ],
+
+        '/tests/test_ignoreSearch_keysNoRequest': [
+          '/__ignoreSearch',
+          '/ignoreSearch?1',
+          '/ignoreSearch?2',
+          '/ignoreSearch?3',
+          '/ignoreSearch',
+        ],
+
+        // keys(request)
+        '/tests/test_ignoreSearch_keysIgnoreNoQuery': [
+          '/ignoreSearch?1',
+          '/ignoreSearch?2',
+          '/ignoreSearch?3',
+          '/ignoreSearch',
+        ],
+        '/tests/test_ignoreSearch_keysNoQuery': [
+          '/ignoreSearch',
+        ],
+        '/tests/test_ignoreSearch_keysIgnoreWithQuery': [
+          '/ignoreSearch?1',
+          '/ignoreSearch?2',
+          '/ignoreSearch?3',
+          '/ignoreSearch',
+        ],
+        '/tests/test_ignoreSearch_keysWithQuery': [
+          '/ignoreSearch?3',
+        ],
+        '/tests/test_ignoreSearch_keysIgnoreNoMatch': [],
+        '/tests/test_ignoreSearch_keysNoMatch': [],
+
+        // delete()
+        '/tests/test_ignoreSearch_deleteIgnoreNoQuery': {
+          deleted: true,
+          keys: ['/__ignoreSearch']
+        },
+        '/tests/test_ignoreSearch_deleteNoQuery': {
+          deleted: true,
+          keys: [
+            '/__ignoreSearch',
+            '/ignoreSearch?1',
+            '/ignoreSearch?2',
+            '/ignoreSearch?3',
+          ]
+        },
+        '/tests/test_ignoreSearch_deleteIgnoreWithQuery': {
+          deleted: true,
+          keys: ['/__ignoreSearch']
+        },
+        '/tests/test_ignoreSearch_deleteWithQuery': {
+          deleted: true,
+          keys: [
+            '/__ignoreSearch',
+            '/ignoreSearch?1',
+            '/ignoreSearch?2',
+            '/ignoreSearch',
+          ]
+        },
+        '/tests/test_ignoreSearch_deleteIgnoreNoMatch': {
+          deleted: false,
+          keys: [
+            '/__ignoreSearch',
+            '/ignoreSearch?1',
+            '/ignoreSearch?2',
+            '/ignoreSearch?3',
+            '/ignoreSearch',
+          ]
+        },
+        '/tests/test_ignoreSearch_deleteNoMatch': {
+          deleted: false,
+          keys: [
+            '/__ignoreSearch',
+            '/ignoreSearch?1',
+            '/ignoreSearch?2',
+            '/ignoreSearch?3',
+            '/ignoreSearch',
+          ]
+        },
+
+        // CacheStorage#match()
+        '/tests/test_ignoreSearch_storageMatchIgnoreNoQuery': { cached: true, index: 1 },
+        '/tests/test_ignoreSearch_storageMatchNoQuery': { cached: true, index: 4 },
+        '/tests/test_ignoreSearch_storageMatchIgnoreWithQuery': { cached: true, index: 1 },
+        '/tests/test_ignoreSearch_storageMatchWithQuery': { cached: true, index: 3 },
+
+        // CacheStorage#match() no cache name
+        '/tests/test_ignoreSearch_storageMatchNoCacheIgnoreNoQuery': { cached: true, index: 1 },
+        '/tests/test_ignoreSearch_storageMatchNoCacheNoQuery': { cached: true, index: 4 },
+        '/tests/test_ignoreSearch_storageMatchNoCacheIgnoreWithQuery': { cached: true, index: 1 },
+        '/tests/test_ignoreSearch_storageMatchNoCacheWithQuery': { cached: true, index: 3 },
+      }
+    };
+
+    navigator.serviceWorker.oncontrollerchange = function() {
+      window.location.reload();
+    };
+
+    if (navigator.serviceWorker.controller) {
+      start();
+    }
+
     navigator.serviceWorker.register('sw.js').then(function() {
-      console.log('Ready');
+      
     }, function(e) {
       console.error(e);
     });
 
-    var requests = {
-      '/tests/test_ignoreSearch_store': {},
+    function start() {
+      Object.keys(tests).reduce(function(prev, key) {
+        var requests = tests[key];
 
-      // other
-      'test_ignoreSearch_keysRequest:no-polyfill': [
-        '/ignoreSearch',
-      ],
+        return prev.then(function() {
+          console.group(key);
 
-      // match()
-      '/tests/test_ignoreSearch_matchIgnoreNoQuery': { cached: true, index: 1 },
-      '/tests/test_ignoreSearch_matchNoQuery': { cached: true, index: 4 },
-      '/tests/test_ignoreSearch_matchIgnoreWithQuery': { cached: true, index: 1 },
-      '/tests/test_ignoreSearch_matchWithQuery': { cached: true, index: 3 },
-      '/tests/test_ignoreSearch_matchIgnoreNoMatch': { cached: false },
-      '/tests/test_ignoreSearch_matchNoMatch': { cached: false },
-
-      // matchAll()
-      '/tests/test_ignoreSearch_matchAllIgnoreNoQuery': [
-        { cached: true, index: 1 },
-        { cached: true, index: 2 },
-        { cached: true, index: 3 },
-        { cached: true, index: 4 },
-      ],
-      '/tests/test_ignoreSearch_matchAllNoQuery': [
-        { cached: true, index: 4 }
-      ],
-      '/tests/test_ignoreSearch_matchAllIgnoreWithQuery': [
-        { cached: true, index: 1 },
-        { cached: true, index: 2 },
-        { cached: true, index: 3 },
-        { cached: true, index: 4 },
-      ],
-      '/tests/test_ignoreSearch_matchAllWithQuery': [
-        { cached: true, index: 3 }
-      ],
-      '/tests/test_ignoreSearch_matchAllIgnoreNoMatch': [],
-      '/tests/test_ignoreSearch_matchAllNoMatch': [],
-
-      // keys() basics
-
-      'test_ignoreSearch_keysRequest': [
-        '/ignoreSearch',
-      ],
-
-      '/tests/test_ignoreSearch_keysNoRequest': [
-        '/__ignoreSearch',
-        '/ignoreSearch?1',
-        '/ignoreSearch?2',
-        '/ignoreSearch?3',
-        '/ignoreSearch',
-      ],
-
-      // keys(request)
-      '/tests/test_ignoreSearch_keysIgnoreNoQuery': [
-        '/ignoreSearch?1',
-        '/ignoreSearch?2',
-        '/ignoreSearch?3',
-        '/ignoreSearch',
-      ],
-      '/tests/test_ignoreSearch_keysNoQuery': [
-        '/ignoreSearch',
-      ],
-      '/tests/test_ignoreSearch_keysIgnoreWithQuery': [
-        '/ignoreSearch?1',
-        '/ignoreSearch?2',
-        '/ignoreSearch?3',
-        '/ignoreSearch',
-      ],
-      '/tests/test_ignoreSearch_keysWithQuery': [
-        '/ignoreSearch?3',
-      ],
-      '/tests/test_ignoreSearch_keysIgnoreNoMatch': [],
-      '/tests/test_ignoreSearch_keysNoMatch': [],
-
-      // delete()
-      '/tests/test_ignoreSearch_deleteIgnoreNoQuery': {
-        deleted: true,
-        keys: ['/__ignoreSearch']
-      },
-      '/tests/test_ignoreSearch_deleteNoQuery': {
-        deleted: true,
-        keys: [
-          '/__ignoreSearch',
-          '/ignoreSearch?1',
-          '/ignoreSearch?2',
-          '/ignoreSearch?3',
-        ]
-      },
-      '/tests/test_ignoreSearch_deleteIgnoreWithQuery': {
-        deleted: true,
-        keys: ['/__ignoreSearch']
-      },
-      '/tests/test_ignoreSearch_deleteWithQuery': {
-        deleted: true,
-        keys: [
-          '/__ignoreSearch',
-          '/ignoreSearch?1',
-          '/ignoreSearch?2',
-          '/ignoreSearch',
-        ]
-      },
-      '/tests/test_ignoreSearch_deleteIgnoreNoMatch': {
-        deleted: false,
-        keys: [
-          '/__ignoreSearch',
-          '/ignoreSearch?1',
-          '/ignoreSearch?2',
-          '/ignoreSearch?3',
-          '/ignoreSearch',
-        ]
-      },
-      '/tests/test_ignoreSearch_deleteNoMatch': {
-        deleted: false,
-        keys: [
-          '/__ignoreSearch',
-          '/ignoreSearch?1',
-          '/ignoreSearch?2',
-          '/ignoreSearch?3',
-          '/ignoreSearch',
-        ]
-      },
-
-      // CacheStorage#match()
-      '/tests/test_ignoreSearch_storageMatchIgnoreNoQuery': { cached: true, index: 1 },
-      '/tests/test_ignoreSearch_storageMatchNoQuery': { cached: true, index: 4 },
-      '/tests/test_ignoreSearch_storageMatchIgnoreWithQuery': { cached: true, index: 1 },
-      '/tests/test_ignoreSearch_storageMatchWithQuery': { cached: true, index: 3 },
-
-      // CacheStorage#match() no cache name
-      '/tests/test_ignoreSearch_storageMatchNoCacheIgnoreNoQuery': { cached: true, index: 1 },
-      '/tests/test_ignoreSearch_storageMatchNoCacheNoQuery': { cached: true, index: 4 },
-      '/tests/test_ignoreSearch_storageMatchNoCacheIgnoreWithQuery': { cached: true, index: 1 },
-      '/tests/test_ignoreSearch_storageMatchNoCacheWithQuery': { cached: true, index: 3 },
+          return test(requests).then(function() {
+            console.groupEnd(key);
+          });
+        });
+      }, Promise.resolve()).then(function() {
+        console.info('DONE');
+      });
     };
 
-    /*var requests = {
-      '/tests/test_ignoreSearch_store': {},
-      '/tests/test_ignoreSearch_keysRequest': [
-        '/ignoreSearch',
-      ],
-      '/tests/test_ignoreSearch_keysRequest:no-polyfill': [
-        '/ignoreSearch',
-      ],
-    };*/
-
-    window.start = function() {
-      Object.keys(requests).reduce(function(prev, req) {
+    function test(requests) {
+      return Object.keys(requests).reduce(function(prev, req) {
         return prev.then(function() {
           return fetch(req);
         }).then(function(res) {
@@ -165,14 +185,21 @@
           if (JSON.stringify(expected) === JSON.stringify(actual)) {
             console.log(`Request [${ req }] passed`);
           } else {
-            console.error(`Request [${ req }] not passed`);
-            console.info('Expected:', JSON.stringify(expected, null, '  '));
-            console.info('Actual:', JSON.stringify(actual, null, '  '));
+            if (window.chrome) {
+              console.groupCollapsed(`%cRequest [${ req }] not passed`, 'color: red;');
+            } else {
+              console.group();
+              console.error(`Request [${ req }] not passed`);
+            }
+
+            console.info('%cExpected: ' + JSON.stringify(expected, null, '  '), 'background: #085F08; color: white;');
+            console.info('%cActual: ' + JSON.stringify(actual, null, '  '), 'background: #9E3F3F; color: white;');
+            console.groupEnd();
           }
         });
-      }, Promise.resolve()).then(function() {
-        console.info('DONE');
-      });
-    };
+      }, Promise.resolve());
+    }
+
+    window.start = start;
   }());
 </script>
