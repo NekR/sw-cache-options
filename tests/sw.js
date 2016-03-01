@@ -17,12 +17,7 @@ var tests = {
   'ignoreSearch_keysRequest:no-polyfill': function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return keys_original.call(cache, '/ignoreSearch');
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
-      });
-    }).then(function(data) {
+    }).then(mapKeys).then(function(data) {
       return createResponse(data);
     });
   },
@@ -64,6 +59,28 @@ var tests = {
   ignoreSearch_matchWithQuery: function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return cache.match('/ignoreSearch?3', {
+        ignoreSearch: false
+      });
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_matchIgnoreNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return cache.match('/__noMatch', {
+        ignoreSearch: true
+      });
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_matchNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return cache.match('/__noMatch', {
         ignoreSearch: false
       });
     }).then(function(response) {
@@ -142,46 +159,64 @@ var tests = {
       });
     });
   },
+  ignoreSearch_matchAllIgnoreNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return cache.matchAll('/__noMatch', {
+        ignoreSearch: true
+      });
+    }).then(function(responses) {
+      const result = responses.map(function(response) {
+        return (response || createResponse({
+          cached: false
+        })).json();
+      });
+
+      return Promise.all(result).then(function(data) {
+        return createResponse(data);
+      });
+    });
+  },
+  ignoreSearch_matchAllNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return cache.matchAll('/__noMatch', {
+        ignoreSearch: false
+      });
+    }).then(function(responses) {
+      const result = responses.map(function(response) {
+        return (response || createResponse({
+          cached: false
+        })).json();
+      });
+
+      return Promise.all(result).then(function(data) {
+        return createResponse(data);
+      });
+    });
+  },
 
   // keys()
   ignoreSearch_keysRequest: function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return cache.keys('/ignoreSearch');
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
-      });
-    }).then(function(data) {
+    }).then(mapKeys).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_keysNoRequest: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return cache.keys();
+    }).then(mapKeys).then(function(data) {
       return createResponse(data);
     });
   },
 
   // keys(request)
-  ignoreSearch_keysNoRequest: function(e) {
-    return caches.open('ignoreSearch').then(function(cache) {
-      return cache.keys();
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
-      });
-    }).then(function(data) {
-      return createResponse(data);
-    });
-  },
-
   ignoreSearch_keysIgnoreNoQuery: function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return cache.keys('/ignoreSearch', {
         ignoreSearch: true
       });
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
-      });
-    }).then(function(data) {
+    }).then(mapKeys).then(function(data) {
       return createResponse(data);
     });
   },
@@ -190,12 +225,7 @@ var tests = {
       return cache.keys('/ignoreSearch', {
         ignoreSearch: false
       });
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
-      });
-    }).then(function(data) {
+    }).then(mapKeys).then(function(data) {
       return createResponse(data);
     });
   },
@@ -204,12 +234,7 @@ var tests = {
       return cache.keys('/ignoreSearch?3', {
         ignoreSearch: true
       });
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
-      });
-    }).then(function(data) {
+    }).then(mapKeys).then(function(data) {
       return createResponse(data);
     });
   },
@@ -218,12 +243,25 @@ var tests = {
       return cache.keys('/ignoreSearch?3', {
         ignoreSearch: false
       });
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
+    }).then(mapKeys).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_keysIgnoreNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return cache.keys('/__noMatch', {
+        ignoreSearch: true
       });
-    }).then(function(data) {
+    }).then(mapKeys).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_keysNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return cache.keys('/__noMatch', {
+        ignoreSearch: false
+      });
+    }).then(mapKeys).then(function(data) {
       return createResponse(data);
     });
   },
@@ -272,6 +310,32 @@ var tests = {
     return caches.open('ignoreSearch').then(function(cache) {
       return deleteHelper(cache, '/ignoreSearch?3', {
         ignoreSearch: false
+      });
+    }).then(function(data) {
+      return ignoreSearchPrepare().then(function() {
+        return data;
+      })
+    }).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_deleteIgnoreNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return deleteHelper(cache, '/__noMatch', {
+        ignoreSearch: true
+      });
+    }).then(function(data) {
+      return ignoreSearchPrepare().then(function() {
+        return data;
+      })
+    }).then(function(data) {
+      return createResponse(data);
+    });
+  },
+  ignoreSearch_deleteNoMatch: function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return deleteHelper(cache, '/__noMatch', {
+        ignoreSearch: true
       });
     }).then(function(data) {
       return ignoreSearchPrepare().then(function() {

@@ -11,11 +11,18 @@
     var requests = {
       '/tests/test_ignoreSearch_store': {},
 
+      // other
+      'test_ignoreSearch_keysRequest:no-polyfill': [
+        '/ignoreSearch',
+      ],
+
       // match()
       '/tests/test_ignoreSearch_matchIgnoreNoQuery': { cached: true, index: 1 },
       '/tests/test_ignoreSearch_matchNoQuery': { cached: true, index: 4 },
       '/tests/test_ignoreSearch_matchIgnoreWithQuery': { cached: true, index: 1 },
       '/tests/test_ignoreSearch_matchWithQuery': { cached: true, index: 3 },
+      '/tests/test_ignoreSearch_matchIgnoreNoMatch': { cached: false },
+      '/tests/test_ignoreSearch_matchNoMatch': { cached: false },
 
       // matchAll()
       '/tests/test_ignoreSearch_matchAllIgnoreNoQuery': [
@@ -36,11 +43,10 @@
       '/tests/test_ignoreSearch_matchAllWithQuery': [
         { cached: true, index: 3 }
       ],
+      '/tests/test_ignoreSearch_matchAllIgnoreNoMatch': [],
+      '/tests/test_ignoreSearch_matchAllNoMatch': [],
 
       // keys() basics
-      'test_ignoreSearch_keysRequest:no-polyfill': [
-        '/ignoreSearch',
-      ],
 
       'test_ignoreSearch_keysRequest': [
         '/ignoreSearch',
@@ -73,6 +79,8 @@
       '/tests/test_ignoreSearch_keysWithQuery': [
         '/ignoreSearch?3',
       ],
+      '/tests/test_ignoreSearch_keysIgnoreNoMatch': [],
+      '/tests/test_ignoreSearch_keysNoMatch': [],
 
       // delete()
       '/tests/test_ignoreSearch_deleteIgnoreNoQuery': {
@@ -98,6 +106,26 @@
           '/__ignoreSearch',
           '/ignoreSearch?1',
           '/ignoreSearch?2',
+          '/ignoreSearch',
+        ]
+      },
+      '/tests/test_ignoreSearch_deleteIgnoreNoMatch': {
+        deleted: false,
+        keys: [
+          '/__ignoreSearch',
+          '/ignoreSearch?1',
+          '/ignoreSearch?2',
+          '/ignoreSearch?3',
+          '/ignoreSearch',
+        ]
+      },
+      '/tests/test_ignoreSearch_deleteNoMatch': {
+        deleted: false,
+        keys: [
+          '/__ignoreSearch',
+          '/ignoreSearch?1',
+          '/ignoreSearch?2',
+          '/ignoreSearch?3',
           '/ignoreSearch',
         ]
       },
