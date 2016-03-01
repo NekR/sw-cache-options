@@ -101,6 +101,18 @@
           '/ignoreSearch',
         ]
       },
+
+      // CacheStorage#match()
+      '/tests/test_ignoreSearch_storageMatchIgnoreNoQuery': { cached: true, index: 1 },
+      '/tests/test_ignoreSearch_storageMatchNoQuery': { cached: true, index: 4 },
+      '/tests/test_ignoreSearch_storageMatchIgnoreWithQuery': { cached: true, index: 1 },
+      '/tests/test_ignoreSearch_storageMatchWithQuery': { cached: true, index: 3 },
+
+      // CacheStorage#match() no cache name
+      '/tests/test_ignoreSearch_storageMatchNoCacheIgnoreNoQuery': { cached: true, index: 1 },
+      '/tests/test_ignoreSearch_storageMatchNoCacheNoQuery': { cached: true, index: 4 },
+      '/tests/test_ignoreSearch_storageMatchNoCacheIgnoreWithQuery': { cached: true, index: 1 },
+      '/tests/test_ignoreSearch_storageMatchNoCacheWithQuery': { cached: true, index: 3 },
     };
 
     /*var requests = {

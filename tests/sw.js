@@ -6,12 +6,28 @@ var delete_original = Cache.prototype.delete;
 importScripts('../lib/index.js');
 
 var tests = {
+  // init
   ignoreSearch_store: function(e) {
     return ignoreSearchPrepare().then(function() {
       return createResponse({});
     });
   },
 
+  // other
+  'ignoreSearch_keysRequest:no-polyfill': function(e) {
+    return caches.open('ignoreSearch').then(function(cache) {
+      return keys_original.call(cache, '/ignoreSearch');
+    }).then(function(keys) {
+      return keys.map(function(req) {
+        var url = new URL(req.url);
+        return url.pathname + url.search;
+      });
+    }).then(function(data) {
+      return createResponse(data);
+    });
+  },
+
+  // match()
   ignoreSearch_matchIgnoreNoQuery: function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return cache.match('/ignoreSearch', {
@@ -57,6 +73,7 @@ var tests = {
     });
   },
 
+  // matchAll()
   ignoreSearch_matchAllIgnoreNoQuery: function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return cache.matchAll('/ignoreSearch', {
@@ -126,19 +143,7 @@ var tests = {
     });
   },
 
-  'ignoreSearch_keysRequest:no-polyfill': function(e) {
-    return caches.open('ignoreSearch').then(function(cache) {
-      return keys_original.call(cache, '/ignoreSearch');
-    }).then(function(keys) {
-      return keys.map(function(req) {
-        var url = new URL(req.url);
-        return url.pathname + url.search;
-      });
-    }).then(function(data) {
-      return createResponse(data);
-    });
-  },
-
+  // keys()
   ignoreSearch_keysRequest: function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return cache.keys('/ignoreSearch');
@@ -152,6 +157,7 @@ var tests = {
     });
   },
 
+  // keys(request)
   ignoreSearch_keysNoRequest: function(e) {
     return caches.open('ignoreSearch').then(function(cache) {
       return cache.keys();
@@ -273,6 +279,86 @@ var tests = {
       })
     }).then(function(data) {
       return createResponse(data);
+    });
+  },
+
+  // CacheStorage.match()
+  ignoreSearch_storageMatchIgnoreNoQuery: function(e) {
+    return caches.match('/ignoreSearch', {
+      cacheName: 'ignoreSearch',
+      ignoreSearch: true
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_storageMatchNoQuery: function(e) {
+    return caches.match('/ignoreSearch', {
+      cacheName: 'ignoreSearch',
+      ignoreSearch: false
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_storageMatchIgnoreWithQuery: function(e) {
+    return caches.match('/ignoreSearch?3', {
+      cacheName: 'ignoreSearch',
+      ignoreSearch: true
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_storageMatchWithQuery: function(e) {
+    return caches.match('/ignoreSearch?3', {
+      cacheName: 'ignoreSearch',
+      ignoreSearch: false
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+
+  // CacheStorage.match() no cacheName
+  ignoreSearch_storageMatchNoCacheIgnoreNoQuery: function(e) {
+    return caches.match('/ignoreSearch', {
+      ignoreSearch: true
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_storageMatchNoCacheNoQuery: function(e) {
+    return caches.match('/ignoreSearch', {
+      ignoreSearch: false
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_storageMatchNoCacheIgnoreWithQuery: function(e) {
+    return caches.match('/ignoreSearch?3', {
+      ignoreSearch: true
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
+    });
+  },
+  ignoreSearch_storageMatchNoCacheWithQuery: function(e) {
+    return caches.match('/ignoreSearch?3', {
+      ignoreSearch: false
+    }).then(function(response) {
+      return response || createResponse({
+        cached: false
+      });
     });
   },
 };

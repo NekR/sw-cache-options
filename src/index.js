@@ -149,25 +149,22 @@
         });
       }
 
-      this.keys().then((keys) => {
-        let result = Promise.resolve();
+      return this.keys().then((keys) => {
         let cursor = -1;
 
-        const step = () => {
+        const step = (val) => {
           cursor++;
 
-          return result.then((val) => {
-            if (typeof val !== 'undefined' || cursor >= keys.length) {
-              return val;
-            }
+          if (typeof val !== 'undefined' || cursor >= keys.length) {
+            return val;
+          }
 
-            return this.open(keys[cursor]).then(function(cache) {
-              return cache.match(request, options);
-            }).then(step);
-          });
+          return this.open(keys[cursor]).then(function(cache) {
+            return cache.match(request, options);
+          }).then(step);
         };
 
-        return keys.length ? step() : result;
+        return step();
       });
     },
     enumerable: false,
