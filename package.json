@@ -1,7 +1,7 @@
 {
   "name": "sw-cache-options",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
+  "description": "ServiceWorker CacheQueryOptions polyfill (ignoreSearch)",
   "main": "lib/index.js",
   "files": [
     "lib/"
@@ -9,6 +9,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "serviceworker",
+    "service worker",
+    "polyfill",
+    "ignoreSearch",
+    "ignoreMethod",
+    "ignoreVary",
+    "CacheQueryOptions",
+    "cache"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
